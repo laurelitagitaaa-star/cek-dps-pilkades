@@ -4,13 +4,16 @@ import pandas as pd
 # 1. Konfigurasi Halaman Website
 st.set_page_config(page_title="Cek DPT Pilkades", page_icon="🗳️", layout="centered")
 
-st.title("🗳️ Posko Digital Cek DPS Pilkades DESA BAJONG ")
+st.title("🗳️ Posko Digital Cek DPT Pilkades")
 st.write("""Silakan masukkan NIK atau Nama Lengkap Anda untuk mengecek status daftar pemilih dan lokasi TPS.""")
 
 # 2. Membaca Data Excel
 @st.cache_data
 def load_data():
     df = pd.read_excel("data_dpt.xlsx", dtype={"NIK": str})
+    # Membersihkan spasi di awal/akhir pada data Nama dan NIK di Excel agar pencarian akurat
+    df['NIK'] = df['NIK'].astype(str).str.strip()
+    df['Nama'] = df['Nama'].astype(str).str.strip()
     return df
 
 try:
@@ -27,12 +30,14 @@ try:
             if len(input_nik) < 16:
                 st.warning("⚠️ NIK harus 16 digit. Periksa kembali ketikan Anda.")
             else:
+                # Proses pencarian data NIK
                 hasil = data_dpt[data_dpt['NIK'] == input_nik.strip()]
                 
                 if not hasil.empty:
                     st.success("✅ DATA DITEMUKAN! Anda terdaftar sebagai pemilih.")
                     nik_sensor = input_nik[:6] + "**********"
                     
+                    # Menampilkan data aman (Memperbaiki KeyError menggunakan iloc[0])
                     st.info(f"""
                     * **NIK:** {nik_sensor}
                     * **Nama Pemilih:** {hasil.iloc[0]['Nama']}
@@ -51,12 +56,17 @@ try:
             if input_nama.strip() == "":
                 st.warning("⚠️ Silakan ketik nama terlebih dahulu.")
             else:
-                hasil = data_dpt[data_dpt['Nama'].str.contains(input_nama, case=False, na=False)]
+                # Mencari nama yang mengandung kata kunci (tidak sensitif huruf besar/kecil)
+                hasil = data_dpt[data_dpt['Nama'].str.contains(input_nama.strip(), case=False, na=False)]
                 
                 if not hasil.empty:
                     st.success(f"✅ Ditemukan {len(hasil)} data yang cocok:")
                     tampilan_hasil = hasil.copy()
-                    tampilan_hasil['NIK'] = tampilan_hasil['NIK'].apply(lambda x: str(x)[:6] + "**********" if pd.notnull(x) else x)
+                    
+                    # Menghindari error sensor nama jika data kosong/bukan string
+                    tampilan_hasil['NIK'] = tampilan_hasil['NIK'].apply(lambda x: str(x)[:6] + "**********" if pd.notnull(x) else "**********")
+                    
+                    # Menampilkan tabel data yang dicari berdasarkan Nama
                     st.dataframe(tampilan_hasil[['Nama', 'JK', 'RT', 'RW', 'TPS']], use_container_width=True)
                 else:
                     st.error("""❌ Nama tidak ditemukan. Silakan pastikan ejaan nama sudah benar.""")
