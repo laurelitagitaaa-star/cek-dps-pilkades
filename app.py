@@ -34,8 +34,7 @@ st.markdown(f"""
 - **Lokasi Memilih:** :green[{row['TPS']}]
 """ )
 else:
-st.error("■ Data tidak ditemukan. Silakan hubungi Panitia Pilkades untuk konfirma
-si.")
+st.error("""❌ Data tidak ditemukan. Silakan hubungi Panitia Pilkades untuk konfirmasi lebih lanjut.""")
 else:
 nama_input = st.text_input("Masukkan Nama Lengkap (Sesuai KTP):")
 tombol = st.button("Cari Data")
