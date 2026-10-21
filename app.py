@@ -4,7 +4,7 @@ import pandas as pd
 # 1. Konfigurasi Halaman Website
 st.set_page_config(page_title="Cek DPT Pilkades", page_icon="🗳️", layout="centered")
 
-st.title("🗳️ Posko Digital Cek DPT Pilkades")
+st.title("🗳️ Posko Digital Cek DPS Pilkades DESA BAJONG ")
 st.write("""Silakan masukkan NIK atau Nama Lengkap Anda untuk mengecek status daftar pemilih dan lokasi TPS.""")
 
 # 2. Membaca Data Excel
